@@ -87,8 +87,8 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
 <div class="cover" id="cover">
   <div class="cover-inner">
     <div class="cover-tag">Questionário Clínico · Uso Confidencial</div>
-    <h1>Bem-vindo(a).<br><em>Vamos nos conhecer melhor?</em></h1>
-    <p>Sua médica preparou este questionário para entender melhor como você pensa, sente e vive. Não há respostas certas ou erradas — responda com honestidade, do jeito que você realmente é.<br><br>Leva entre 15 e 20 minutos.</p>
+    <h1>Olá.<br><em>Que bom ter você aqui.</em></h1>
+    <p>Sua médica preparou este questionário para entender melhor como você pensa, sente e vive. Não há respostas certas ou erradas — responda com honestidade, do jeito que você realmente é.<br><br>Leva entre 15 e 20 minutos. Pode ir no seu ritmo.</p>
     <button class="btn-next" onclick="showId()">Começar</button>
     <div class="cover-note">Suas respostas são confidenciais e serão usadas exclusivamente pela Dra. Camila Lino.</div>
   </div>
@@ -113,7 +113,22 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
         <div class="radio-row" id="f-sexo">
           <button class="radio-btn" onclick="setSingle('sexo','Masculino',this)">Masculino</button>
           <button class="radio-btn" onclick="setSingle('sexo','Feminino',this)">Feminino</button>
+          <button class="radio-btn" onclick="setSingle('sexo','Intersexo',this)">Intersexo</button>
           <button class="radio-btn" onclick="setSingle('sexo','Prefiro não informar',this)">Prefiro não informar</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Identidade de gênero</label>
+        <div class="radio-row" id="f-genero">
+          <button class="radio-btn" onclick="setSingle('genero','Mulher cisgênero',this)">Mulher cis</button>
+          <button class="radio-btn" onclick="setSingle('genero','Homem cisgênero',this)">Homem cis</button>
+          <button class="radio-btn" onclick="setSingle('genero','Mulher transgênero',this)">Mulher trans</button>
+          <button class="radio-btn" onclick="setSingle('genero','Homem transgênero',this)">Homem trans</button>
+          <button class="radio-btn" onclick="setSingle('genero','Não-binário',this)">Não-binário</button>
+          <button class="radio-btn" onclick="setSingle('genero','Gênero fluido',this)">Gênero fluido</button>
+          <button class="radio-btn" onclick="setSingle('genero','Agênero',this)">Agênero</button>
+          <button class="radio-btn" onclick="setSingle('genero','Outro',this)">Outro</button>
+          <button class="radio-btn" onclick="setSingle('genero','Prefiro não informar',this)">Prefiro não informar</button>
         </div>
       </div>
       <div class="field">
@@ -239,16 +254,16 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
 
 <!-- THANKS -->
 <div class="thanks-wrap" id="thanks">
-  <div class="thanks-icon">💌</div>
-  <h2>Obrigado(a)!</h2>
-  <p>Suas respostas foram enviadas com sucesso para a Dra. Camila.<br><br>Você pode fechar esta janela agora. Até a consulta! 🌿</p>
+  <div class="thanks-icon">🌿</div>
+  <h2 id="thanks-titulo">Obrigada.</h2>
+  <p id="thanks-msg">Suas respostas chegaram com sucesso para a Dra. Camila.<br><br>Isso que você fez — parar, olhar pra dentro e responder com honestidade — já é um passo enorme.<br><br>Pode fechar esta janela. Até breve. 💙</p>
 </div>
 
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqxzKwHWMShVgeAyNMZ-tD6GFyZV62y23Y289Bk2eZVst2LIUgZGUXa7Wbb6f8oQ65/exec';
 
 // ── IDENTIFICAÇÃO ──────────────────────────────────────────────────────────
-let id = { nome:'', nasc:'', sexo:'', unidade:'' };
+let id = { nome:'', nasc:'', sexo:'', genero:'', unidade:'' };
 
 function setSingle(field, val, btn) {
   id[field] = val;
@@ -551,7 +566,7 @@ async function submitQuiz() {
   if (m < 0 || (m === 0 && hoje.getDate() < nascDate.getDate())) idade--;
 
   const payload = {
-    data: dataStr, nome: id.nome, nasc: id.nasc, idade, sexo: id.sexo, unidade: id.unidade,
+    data: dataStr, nome: id.nome, nasc: id.nasc, idade, sexo: id.sexo, genero: id.genero, unidade: id.unidade,
     // scores
     tdah_des: sc.tdah_des, maxDes: sc.maxDes,
     tdah_hip: sc.tdah_hip, maxHip: sc.maxHip,
@@ -560,10 +575,11 @@ async function submitQuiz() {
     tea_sen: sc.tea_sen, maxTeaSen: sc.maxTeaSen,
     ah: sc.ah, maxAh: sc.maxAh,
     dlex: sc.dlex, maxDlex: sc.maxDlex,
-    burn: sc.burn, maxBurn: sc.maxBurn,
+    burn_score: sc.burn, maxBurn: sc.maxBurn,
     // raw arrays
     at: state.at, org: state.org, imp: state.imp, soc: state.soc,
-    sen: state.sen, cog: state.cog, int: state.int, lex: state.lex, burn: state.burn,
+    sen: state.sen, cog: state.cog, int: state.int, lex: state.lex,
+    burn: state.burn,
     his: state.his, open: state.open,
   };
 
@@ -574,6 +590,13 @@ async function submitQuiz() {
       body: JSON.stringify(payload)
     });
   } catch(err) { console.error(err); }
+
+  // Personaliza tela de agradecimento com nome e gênero
+  const primeiroNome = id.nome.split(' ')[0];
+  const genero = id.genero || '';
+  const isMasc = genero === 'Homem cisgênero' || genero === 'Homem transgênero';
+  const agradecimento = isMasc ? `Obrigado, ${primeiroNome}.` : `Obrigada, ${primeiroNome}.`;
+  document.getElementById('thanks-titulo').textContent = agradecimento;
 
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('thanks').style.display = 'flex';
