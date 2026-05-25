@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionário Clínico</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f7f4ef;--card:#fff;--ink:#1c1b1f;--mid:#5a5560;--light:#e8e4dd;--accent:#3d6b84;--accent2:#8b5e52;--border:#ddd8d0;--warm:#f2ede5;--danger:#c0392b;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;}
+
+/* COVER */
+.cover{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1c1b1f;padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(61,107,132,.25) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 80% 70%,rgba(139,94,82,.2) 0%,transparent 70%);}
+.cover-inner{position:relative;z-index:2;max-width:560px;}
+.cover-tag{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:2rem;}
+.cover h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:400;color:#fff;line-height:1.2;margin-bottom:1rem;}
+.cover h1 em{font-style:italic;color:#a8c4d4;}
+.cover p{color:rgba(255,255,255,.5);font-size:14px;line-height:1.9;margin-bottom:2rem;max-width:440px;margin-left:auto;margin-right:auto;}
+.cover-note{margin-top:1.5rem;font-size:11px;color:rgba(255,255,255,.25);max-width:380px;margin-left:auto;margin-right:auto;}
+
+/* IDENTIFICAÇÃO */
+.id-wrap{max-width:680px;margin:0 auto;padding:2.5rem 1.5rem;}
+.id-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:28px;}
+.id-card h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:400;margin-bottom:6px;}
+.id-card p{color:var(--mid);font-size:13px;margin-bottom:24px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--ink);}
+.field input{width:100%;border:1.5px solid var(--border);border-radius:4px;padding:10px 14px;font-family:'Lato',sans-serif;font-size:14px;color:var(--ink);background:#fff;transition:border .15s;}
+.field input:focus{outline:none;border-color:var(--accent);}
+.radio-row{display:flex;gap:10px;flex-wrap:wrap;}
+.radio-btn{border:1.5px solid var(--border);background:#fff;padding:9px 20px;border-radius:20px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;color:var(--ink);}
+.radio-btn:hover{border-color:var(--accent);}
+.radio-btn.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
+.btn-next{background:var(--ink);color:#fff;border:none;padding:14px 44px;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:background .2s;margin-top:8px;}
+.btn-next:hover{background:var(--accent);}
+
+/* QUIZ */
+.quiz-wrap{display:none;max-width:740px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.prog-wrap{position:sticky;top:0;z-index:20;height:4px;background:var(--light);}
+.prog-bar{height:4px;background:var(--accent);width:0%;transition:width .3s;}
+.quiz-head{padding:2rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.quiz-head h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:400;}
+.quiz-head p{color:var(--mid);font-size:13px;margin-top:6px;}
+
+.block{background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:1.8rem;overflow:hidden;}
+.block-head{background:var(--ink);color:#fff;padding:13px 20px;display:flex;align-items:center;gap:12px;}
+.block-num{font-family:'Playfair Display',serif;font-style:italic;font-size:1.2rem;opacity:.5;}
+.block-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.block-sub{font-size:11px;opacity:.4;margin-left:auto;}
+.block-body{padding:20px;}
+.legend{background:var(--warm);border-radius:4px;padding:9px 14px;font-size:12px;color:var(--mid);margin-bottom:18px;line-height:1.6;}
+
+.q{padding:13px 0;border-bottom:1px solid #f5f0ea;}
+.q:last-child{border-bottom:none;}
+.q-text{font-size:14px;color:#2a2630;margin-bottom:10px;}
+.q-hint{font-size:12px;color:#999;margin-bottom:10px;font-style:italic;}
+.opts{display:flex;gap:7px;flex-wrap:wrap;}
+.opt{border:1.5px solid var(--border);background:#fff;padding:7px 16px;border-radius:20px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;color:var(--ink);}
+.opt:hover{border-color:var(--accent);background:#eef4f8;}
+.opt.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
+.num-opts{display:flex;gap:8px;flex-wrap:wrap;}
+.num-opt{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--ink);display:flex;align-items:center;justify-content:center;}
+.num-opt:hover{border-color:var(--accent);background:#eef4f8;}
+.num-opt.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
+.textarea-q{width:100%;border:1.5px solid var(--border);border-radius:4px;padding:10px 14px;font-family:'Lato',sans-serif;font-size:14px;resize:vertical;min-height:80px;color:var(--ink);background:#fff;transition:border .15s;}
+.textarea-q:focus{outline:none;border-color:var(--accent);}
+
+.submit-area{text-align:center;margin-top:2rem;}
+.btn-submit{background:var(--ink);color:#fff;border:none;padding:15px 52px;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:background .2s;}
+.btn-submit:hover{background:var(--accent);}
+
+/* THANKS */
+.thanks-wrap{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;background:#1c1b1f;text-align:center;padding:3rem 1.5rem;}
+.thanks-icon{font-size:3rem;margin-bottom:1.5rem;}
+.thanks-wrap h2{font-family:'Playfair Display',serif;font-size:2rem;color:#fff;font-weight:400;margin-bottom:1rem;}
+.thanks-wrap p{color:rgba(255,255,255,.5);font-size:14px;line-height:1.9;max-width:400px;}
+
+@media(max-width:480px){.num-opt{width:38px;height:38px;font-size:13px;}}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover" id="cover">
+  <div class="cover-inner">
+    <div class="cover-tag">Questionário Clínico · Uso Confidencial</div>
+    <h1>Bem-vindo(a).<br><em>Vamos nos conhecer melhor?</em></h1>
+    <p>Sua médica preparou este questionário para entender melhor como você pensa, sente e vive. Não há respostas certas ou erradas — responda com honestidade, do jeito que você realmente é.<br><br>Leva entre 15 e 20 minutos.</p>
+    <button class="btn-next" onclick="showId()">Começar</button>
+    <div class="cover-note">Suas respostas são confidenciais e serão usadas exclusivamente pela Dra. Camila Lino.</div>
+  </div>
+</div>
+
+<!-- IDENTIFICAÇÃO -->
+<div style="display:none" id="id-screen">
+  <div class="id-wrap">
+    <div class="id-card">
+      <h2>Antes de começar</h2>
+      <p>Precisamos de algumas informações básicas para identificar seu questionário.</p>
+      <div class="field">
+        <label>Nome completo *</label>
+        <input type="text" id="f-nome" placeholder="Seu nome completo">
+      </div>
+      <div class="field">
+        <label>Data de nascimento *</label>
+        <input type="date" id="f-nasc">
+      </div>
+      <div class="field">
+        <label>Sexo biológico *</label>
+        <div class="radio-row" id="f-sexo">
+          <button class="radio-btn" onclick="setSingle('sexo','Masculino',this)">Masculino</button>
+          <button class="radio-btn" onclick="setSingle('sexo','Feminino',this)">Feminino</button>
+          <button class="radio-btn" onclick="setSingle('sexo','Prefiro não informar',this)">Prefiro não informar</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Unidade de atendimento *</label>
+        <div class="radio-row" id="f-unidade">
+          <button class="radio-btn" onclick="setSingle('unidade','Mogi das Cruzes',this)">Mogi das Cruzes</button>
+          <button class="radio-btn" onclick="setSingle('unidade','São Paulo',this)">São Paulo</button>
+          <button class="radio-btn" onclick="setSingle('unidade','Particular',this)">Particular</button>
+        </div>
+      </div>
+      <button class="btn-next" onclick="showQuiz()">Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="quiz-wrap" id="quiz">
+  <div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div>
+  <div class="quiz-head">
+    <h2>Questionário de Autoconhecimento</h2>
+    <p>Responda com base em como você <strong>realmente é</strong> — não como gostaria de ser ou como as pessoas te veem.</p>
+  </div>
+
+  <!-- 01 ATENÇÃO E FOCO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">01</span><span class="block-title">Atenção e foco</span><span class="block-sub">10 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca / não se aplica · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre / sempre</div>
+      <div id="atq"></div>
+    </div>
+  </div>
+
+  <!-- 02 ORGANIZAÇÃO E EXECUÇÃO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">02</span><span class="block-title">Organização e execução</span><span class="block-sub">8 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="orgq"></div>
+    </div>
+  </div>
+
+  <!-- 03 ENERGIA E IMPULSIVIDADE -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">03</span><span class="block-title">Energia e impulsividade</span><span class="block-sub">8 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="impq"></div>
+    </div>
+  </div>
+
+  <!-- 04 COMUNICAÇÃO E INTERAÇÃO SOCIAL -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">04</span><span class="block-title">Comunicação e interação social</span><span class="block-sub">10 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="socq"></div>
+    </div>
+  </div>
+
+  <!-- 05 SENSORIALIDADE E ROTINA -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">05</span><span class="block-title">Sentidos e rotina</span><span class="block-sub">9 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="senq"></div>
+    </div>
+  </div>
+
+  <!-- 06 APRENDIZAGEM E HABILIDADES COGNITIVAS -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">06</span><span class="block-title">Como você aprende e pensa</span><span class="block-sub">10 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="cogq"></div>
+    </div>
+  </div>
+
+  <!-- 07 INTENSIDADE EMOCIONAL E SOBREDOTAÇÃO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">07</span><span class="block-title">Como você sente as coisas</span><span class="block-sub">8 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="intq"></div>
+    </div>
+  </div>
+
+  <!-- 08 LEITURA, ESCRITA E CÁLCULO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">08</span><span class="block-title">Leitura, escrita e números</span><span class="block-sub">8 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="lexq"></div>
+    </div>
+  </div>
+
+  <!-- 09 ESGOTAMENTO E MASCARAMENTO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">09</span><span class="block-title">Esforço e esgotamento</span><span class="block-sub">8 perguntas</span></div>
+    <div class="block-body">
+      <div class="legend"><strong>0</strong> = nunca · <strong>1</strong> = raramente · <strong>2</strong> = às vezes · <strong>3</strong> = frequente · <strong>4</strong> = quase sempre</div>
+      <div id="burnq"></div>
+    </div>
+  </div>
+
+  <!-- 10 HISTÓRICO E CONTEXTO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">10</span><span class="block-title">Histórico e contexto</span><span class="block-sub">6 perguntas</span></div>
+    <div class="block-body">
+      <div id="hisq"></div>
+    </div>
+  </div>
+
+  <!-- 11 PERGUNTAS ABERTAS -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">11</span><span class="block-title">Com suas próprias palavras</span><span class="block-sub">4 perguntas</span></div>
+    <div class="block-body"><div id="openq"></div></div>
+  </div>
+
+  <div class="submit-area">
+    <button class="btn-submit" onclick="submitQuiz()">Enviar para a Dra. Camila</button>
+  </div>
+</div>
+
+<!-- THANKS -->
+<div class="thanks-wrap" id="thanks">
+  <div class="thanks-icon">💌</div>
+  <h2>Obrigado(a)!</h2>
+  <p>Suas respostas foram enviadas com sucesso para a Dra. Camila.<br><br>Você pode fechar esta janela agora. Até a consulta! 🌿</p>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqxzKwHWMShVgeAyNMZ-tD6GFyZV62y23Y289Bk2eZVst2LIUgZGUXa7Wbb6f8oQ65/exec';
+
+// ── IDENTIFICAÇÃO ──────────────────────────────────────────────────────────
+let id = { nome:'', nasc:'', sexo:'', unidade:'' };
+
+function setSingle(field, val, btn) {
+  id[field] = val;
+  const row = btn.parentElement;
+  row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function showId() {
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('id-screen').style.display = 'block';
+}
+
+function showQuiz() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const nasc = document.getElementById('f-nasc').value;
+  if (!nome || !nasc || !id.sexo || !id.unidade) {
+    alert('Por favor, preencha todos os campos antes de continuar.');
+    return;
+  }
+  id.nome = nome;
+  id.nasc = nasc;
+  document.getElementById('id-screen').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderAll();
+}
+
+// ── QUESTÕES ───────────────────────────────────────────────────────────────
+
+// 01 ATENÇÃO (TDAH desatento / TDAH geral / TEA)
+const atQs = [
+  "Tenho dificuldade em manter a atenção em tarefas longas ou pouco estimulantes.",
+  "Me distraio facilmente com estímulos externos (sons, movimentos, pensamentos).",
+  "Esqueço compromissos, objetos ou o que estava fazendo com frequência.",
+  "Começo muitas tarefas mas tenho dificuldade em terminá-las.",
+  "Quando algo me interessa muito, entro em um estado de foco tão intenso que perco a noção do tempo.",
+  "Tenho dificuldade em prestar atenção em conversas quando há outros estímulos ao redor.",
+  "Preciso reler textos várias vezes para absorver o conteúdo.",
+  "Cometo erros por descuido mesmo em coisas que sei fazer.",
+  "Tenho dificuldade em seguir instruções com múltiplos passos.",
+  "Minha atenção melhora muito quando o assunto é do meu interesse.",
+];
+
+// 02 ORGANIZAÇÃO (TDAH / TEA / 2e)
+const orgQs = [
+  "Tenho dificuldade em organizar tarefas, materiais ou o ambiente ao meu redor.",
+  "Procrastino tarefas mesmo quando sei que são importantes.",
+  "Tenho dificuldade em estimar quanto tempo uma tarefa vai levar.",
+  "Perco objetos com frequência (chaves, celular, documentos).",
+  "Tenho dificuldade em iniciar tarefas — mesmo querendo fazê-las.",
+  "Meu desempenho varia muito de dia para dia sem razão aparente.",
+  "Tenho dificuldade em priorizar — tudo parece igualmente urgente ou nada parece urgente.",
+  "Ambientes desorganizados me atrapalham muito mais do que atrapalham outras pessoas.",
+];
+
+// 03 ENERGIA / IMPULSIVIDADE (TDAH hiperativo / combinado)
+const impQs = [
+  "Me sinto inquieto(a) por dentro mesmo quando estou parado(a) fisicamente.",
+  "Tenho dificuldade em esperar minha vez em conversas ou filas.",
+  "Falo sem pensar e depois me arrependo do que disse.",
+  "Ajo por impulso em decisões importantes (compras, relacionamentos, mudanças).",
+  "Interrompo pessoas sem perceber.",
+  "Fico entediado(a) muito facilmente e busco estímulo constantemente.",
+  "Tenho dificuldade em relaxar — meu cérebro não 'desliga'.",
+  "Já tive consequências por agir sem pensar nas implicações.",
+];
+
+// 04 COMUNICAÇÃO SOCIAL (TEA / TDAH / AH)
+const socQs = [
+  "Tenho dificuldade em entender o que as pessoas querem dizer quando não falam de forma direta.",
+  "Me sinto desconfortável em conversas que envolvem muita ambiguidade ou subtexto.",
+  "Prefiro interações um a um a grupos grandes.",
+  "Já fui chamado(a) de 'estranho(a)', 'intenso(a)' ou 'diferente' sem entender exatamente por quê.",
+  "Aprendo as regras sociais de forma consciente — como um 'roteiro' — não de forma natural.",
+  "Me esforço muito para parecer 'normal' em situações sociais.",
+  "Tenho dificuldade em manter contato visual de forma confortável.",
+  "Às vezes falo muito sobre assuntos que me interessam sem perceber que a outra pessoa perdeu o interesse.",
+  "Tenho dificuldade em entender expressões faciais ou tom de voz das pessoas.",
+  "Me sinto diferente das pessoas da minha faixa etária — como se não pertencesse ao grupo.",
+];
+
+// 05 SENSORIALIDADE E ROTINA (TEA / TDAH / 2e)
+const senQs = [
+  "Sou muito sensível a sons — barulhos que outros ignoram me incomodam intensamente.",
+  "Sou muito sensível a texturas de roupas, alimentos ou superfícies.",
+  "Luzes fortes ou ambientes visuais intensos me causam desconforto.",
+  "Tenho dificuldade com cheiros fortes que outros mal percebem.",
+  "Mudanças inesperadas na rotina me causam angústia desproporcional.",
+  "Tenho rituais, sequências ou hábitos que preciso seguir para me sentir bem.",
+  "Tenho movimentos ou comportamentos repetitivos que me acalmam (balançar, tamborilar, morder objetos, etc.).",
+  "Tenho restrição alimentar por questão de textura, cheiro ou aparência — não por dieta.",
+  "Ambientes muito estimulantes (shopping, shows, festas) me esgotam rapidamente.",
+];
+
+// 06 COGNIÇÃO / AH / PERFIL INTELECTUAL (WAIS / AH / 2e)
+const cogQs = [
+  "Aprendo coisas novas muito mais rápido do que a maioria das pessoas ao meu redor.",
+  "Quando algo me interessa, vou fundo — pesquiso horas, quero saber tudo.",
+  "Enxergo conexões entre coisas que parecem completamente diferentes para os outros.",
+  "Fico entediado(a) facilmente em atividades repetitivas ou que parecem abaixo do meu nível.",
+  "Questiono regras ou autoridades quando elas não fazem sentido para mim.",
+  "Penso de forma não-linear — vou de A para G sem passar por B, C, D.",
+  "Tenho facilidade com idiomas, música ou habilidades práticas — aprendo de ouvido ou de observação.",
+  "Minha memória para assuntos de interesse é muito boa — mas posso esquecer coisas do cotidiano.",
+  "Já fui considerado(a) superdotado(a), talentoso(a) ou muito acima da média em alguma área.",
+  "Minha performance varia muito com meu estado emocional — posso parecer incapaz quando ansioso(a) e brilhante quando bem.",
+];
+
+// 07 INTENSIDADE EMOCIONAL (AH / Dabrowski / TEA / TDAH)
+const intQs = [
+  "Me afeto intensamente com injustiças, mesmo quando não me envolvem diretamente.",
+  "Músicas, filmes ou livros me movem de forma muito mais profunda do que parecem mover os outros.",
+  "Sinto as emoções dos outros como se fossem minhas.",
+  "Tenho reações emocionais que outras pessoas consideram exageradas.",
+  "Minha intensidade já me causou problemas em relacionamentos ou no trabalho.",
+  "Tenho pensamentos que não consigo parar — ficam girando mesmo quando não quero.",
+  "Me sobrecarrego com muito estímulo ao mesmo tempo.",
+  "Prefiro profundidade a superficialidade — em conversas, interesses e relacionamentos.",
+];
+
+// 08 DISLEXIA / DISCALCULIA / DISGRAFIA
+const lexQs = [
+  "Tenho ou tive dificuldade para aprender a ler — confundia letras, lia devagar ou com muitos erros.",
+  "Tenho dificuldade em soletrar palavras corretamente.",
+  "Minha escrita é difícil de entender — letra ilegível ou muito irregular.",
+  "Tenho dificuldade em copiar texto do quadro ou de telas.",
+  "Tenho dificuldade com operações matemáticas básicas — confundo sinais, esqueço tabuada.",
+  "Confundo direita e esquerda com frequência.",
+  "Tenho dificuldade em entender sequências numéricas, relógios analógicos ou mapas.",
+  "Leio bem em voz alta mas tenho dificuldade em absorver o que acabei de ler.",
+];
+
+// 09 BURNOUT AUTÍSTICO / MASCARAMENTO (TEA / 2e / 3e)
+const burnQs = [
+  "Após situações sociais, preciso de muito tempo sozinho(a) para me recuperar.",
+  "Me esforço constantemente para parecer 'normal' — e isso me esgota.",
+  "Já tive períodos em que perdi habilidades que tinha antes (falar, organizar, funcionar).",
+  "Já fui capaz de funcionar bem por longos períodos e depois entrei em colapso sem aviso.",
+  "Sinto que o esforço que faço para me adaptar não é percebido pelos outros.",
+  "Quando estou sobrecarregado(a), preciso me isolar para conseguir me recuperar.",
+  "Meu nível de energia atual está muito abaixo do que costumava ser.",
+  "Sinto que cheguei ou estou chegando no limite do que consigo aguentar.",
+];
+
+// 10 HISTÓRICO (misto)
+const hisQs = [
+  { q: "Você já teve algum diagnóstico de saúde mental ou neurodesenvolvimento?", type:'yn' },
+  { q: "Alguém na sua família tem diagnóstico de TDAH, TEA, dislexia ou altas habilidades?", type:'yn' },
+  { q: "Na escola, você era considerado(a):", type:'single', opts:["Abaixo da média","Na média","Acima da média","Muito acima — mas com dificuldades específicas","Superdotado(a) / Acelerado(a)"] },
+  { q: "Como você descreveria seu desempenho escolar comparado ao seu potencial?", type:'single', opts:["Correspondia ao meu potencial","Abaixo do que eu poderia render","Muito abaixo — algo me atrapalhava","Inconsistente — ótimo em algumas áreas, péssimo em outras"] },
+  { q: "Você já fez alguma avaliação neuropsicológica formal?", type:'yn' },
+  { q: "Você usa ou já usou medicação para atenção, humor ou ansiedade?", type:'yn' },
+];
+
+// 11 ABERTAS
+const openQs = [
+  { q: "O que te trouxe à consulta agora? O que mudou ou piorou?", hint: "Pode ser qualquer coisa — um evento, uma sensação, algo que percebeu." },
+  { q: "Há algo em você que as pessoas raramente entendem ou que você raramente consegue explicar?", hint: "Pode ser sobre como você pensa, sente ou funciona." },
+  { q: "Em que situações você funciona melhor? E pior?", hint: "Ambiente, horário, tipo de tarefa, companhia..." },
+  { q: "O que gostaria que a Dra. Camila soubesse sobre você que ainda não foi dito?", hint: "Qualquer coisa que pareça importante." },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+const KEYS = ['at','org','imp','soc','sen','cog','int','lex','burn'];
+let state = {
+  at:   Array(10).fill(null),
+  org:  Array(8).fill(null),
+  imp:  Array(8).fill(null),
+  soc:  Array(10).fill(null),
+  sen:  Array(9).fill(null),
+  cog:  Array(10).fill(null),
+  int:  Array(8).fill(null),
+  lex:  Array(8).fill(null),
+  burn: Array(8).fill(null),
+  his:  {},
+  open: Array(4).fill(""),
+};
+
+const idMap  = { at:'atq', org:'orgq', imp:'impq', soc:'socq', sen:'senq', cog:'cogq', int:'intq', lex:'lexq', burn:'burnq' };
+const qMap   = { at:atQs, org:orgQs, imp:impQs, soc:socQs, sen:senQs, cog:cogQs, int:intQs, lex:lexQs, burn:burnQs };
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function renderAll() {
+  KEYS.forEach(k => renderScale(idMap[k], qMap[k], k, 5));
+  renderHis();
+  renderOpen();
+  updateProg();
+}
+
+function renderScale(containerId, qs, key, max) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  qs.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    const nums = Array.from({length:max}, (_,v) =>
+      `<button class="num-opt ${state[key][i]===v?'sel':''}" onclick="setScale('${key}',${i},${v})">${v}</button>`
+    ).join('');
+    div.innerHTML = `<div class="q-text">${i+1}. ${q}</div><div class="num-opts">${nums}</div>`;
+    c.appendChild(div);
+  });
+}
+
+function setScale(key, i, v) {
+  state[key][i] = v;
+  renderScale(idMap[key], qMap[key], key, 5);
+  updateProg();
+}
+
+function renderHis() {
+  const c = document.getElementById('hisq');
+  c.innerHTML = '';
+  hisQs.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    let inner = `<div class="q-text">${i+1}. ${item.q}</div>`;
+    if (item.type === 'yn') {
+      inner += `<div class="opts">` +
+        ['Sim','Não','Não sei'].map(v =>
+          `<button class="opt ${state.his[i]===v?'sel':''}" onclick="setHis(${i},'${v}')">${v}</button>`
+        ).join('') + `</div>`;
+    } else {
+      inner += `<div class="opts">` +
+        item.opts.map(v =>
+          `<button class="opt ${state.his[i]===v?'sel':''}" onclick="setHis(${i},'${encodeURIComponent(v)}')">${v}</button>`
+        ).join('') + `</div>`;
+    }
+    div.innerHTML = inner;
+    c.appendChild(div);
+  });
+}
+
+function setHis(i, v) {
+  state.his[i] = decodeURIComponent(v);
+  renderHis();
+  updateProg();
+}
+
+function renderOpen() {
+  const c = document.getElementById('openq');
+  c.innerHTML = '';
+  openQs.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    div.innerHTML = `<div class="q-text">${i+1}. ${item.q}</div>
+      <div class="q-hint">${item.hint}</div>
+      <textarea class="textarea-q" placeholder="Escreva aqui..." oninput="state.open[${i}]=this.value">${state.open[i]}</textarea>`;
+    c.appendChild(div);
+  });
+}
+
+function updateProg() {
+  const total = 10+8+8+10+9+10+8+8+8+4;
+  let ans = 0;
+  KEYS.forEach(k => { ans += state[k].filter(v=>v!==null).length; });
+  ans += Object.keys(state.his).length;
+  document.getElementById('progBar').style.width = Math.min(100, Math.round(ans/total*100))+'%';
+}
+
+// ── SCORES ────────────────────────────────────────────────────────────────
+function sum(arr) { return arr.reduce((a,b)=>a+(b||0),0); }
+
+function calcScores() {
+  // TDAH-Desatento: at[0..4,6,7,8] + org[0..6]
+  const tdah_des = sum([state.at[0],state.at[1],state.at[2],state.at[3],state.at[6],state.at[7],state.at[8]])
+                 + sum([state.org[0],state.org[1],state.org[2],state.org[3],state.org[4],state.org[5],state.org[6]]);
+  // TDAH-Hiperatvo/Impulsivo: imp
+  const tdah_hip = sum(state.imp);
+  // Hiperfoco (AH/TDAH): at[4], at[9], cog[1]
+  const hiperfoco = (state.at[4]||0)+(state.at[9]||0)+(state.cog[1]||0);
+  // TEA-Social: soc
+  const tea_soc = sum(state.soc);
+  // TEA-Sensorial+Rotina: sen
+  const tea_sen = sum(state.sen);
+  // AH/SD: cog + int
+  const ah = sum(state.cog) + sum(state.int);
+  // Dislexia/Discalculia: lex
+  const dlex = sum(state.lex);
+  // Burnout/Mascaramento: burn
+  const burn = sum(state.burn);
+
+  return { tdah_des, tdah_hip, hiperfoco, tea_soc, tea_sen, ah, dlex, burn,
+           maxDes:56, maxHip:32, maxHiper:12, maxTeaSoc:40, maxTeaSen:36, maxAh:72, maxDlex:32, maxBurn:32 };
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────
+async function submitQuiz() {
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = '⏳ Enviando...';
+  btn.disabled = true;
+
+  const dataStr = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const sc = calcScores();
+
+  // Calcula idade
+  const nascDate = new Date(id.nasc);
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nascDate.getFullYear();
+  const m = hoje.getMonth() - nascDate.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < nascDate.getDate())) idade--;
+
+  const payload = {
+    data: dataStr, nome: id.nome, nasc: id.nasc, idade, sexo: id.sexo, unidade: id.unidade,
+    // scores
+    tdah_des: sc.tdah_des, maxDes: sc.maxDes,
+    tdah_hip: sc.tdah_hip, maxHip: sc.maxHip,
+    hiperfoco: sc.hiperfoco, maxHiper: sc.maxHiper,
+    tea_soc: sc.tea_soc, maxTeaSoc: sc.maxTeaSoc,
+    tea_sen: sc.tea_sen, maxTeaSen: sc.maxTeaSen,
+    ah: sc.ah, maxAh: sc.maxAh,
+    dlex: sc.dlex, maxDlex: sc.maxDlex,
+    burn: sc.burn, maxBurn: sc.maxBurn,
+    // raw arrays
+    at: state.at, org: state.org, imp: state.imp, soc: state.soc,
+    sen: state.sen, cog: state.cog, int: state.int, lex: state.lex, burn: state.burn,
+    his: state.his, open: state.open,
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+  } catch(err) { console.error(err); }
+
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('thanks').style.display = 'flex';
+}
+</script>
+</body>
+</html>
