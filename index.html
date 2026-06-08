@@ -139,6 +139,10 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
           <button class="radio-btn" onclick="setSingle('unidade','Particular',this)">Particular</button>
         </div>
       </div>
+      <div class="field">
+        <label>Seu e-mail <span style="font-weight:300;color:#999">(opcional — se quiser receber uma cópia das suas respostas)</span></label>
+        <input type="email" id="f-email" placeholder="seuemail@email.com">
+      </div>
       <button class="btn-next" onclick="showQuiz()">Continuar →</button>
     </div>
   </div>
@@ -260,21 +264,51 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqxzKwHWMShVgeAyNMZ-tD6GFyZV62y23Y289Bk2eZVst2LIUgZGUXa7Wbb6f8oQ65/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyivYGTUdV0OFrYuCxRcpshJhKeYu4ppMvfIkQ8u0_0c1HwJERUo33u1LJprBh-WOlC/exec';
 
 // ── IDENTIFICAÇÃO ──────────────────────────────────────────────────────────
-let id = { nome:'', nasc:'', sexo:'', genero:'', unidade:'' };
+let id = { nome:'', nasc:'', sexo:'', genero:'', unidade:'', email:'' };
+
+const SAVE_KEY = 'rastreio_neurodev_state';
 
 function setSingle(field, val, btn) {
   id[field] = val;
   const row = btn.parentElement;
   row.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
+  autoSave();
+}
+
+function autoSave(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({id, state})); } catch(e){}
+}
+function clearSave(){
+  try { localStorage.removeItem(SAVE_KEY); } catch(e){}
 }
 
 function showId() {
   document.getElementById('cover').style.display = 'none';
   document.getElementById('id-screen').style.display = 'block';
+  try {
+    const saved = localStorage.getItem(SAVE_KEY);
+    if(saved){
+      const data = JSON.parse(saved);
+      if(data.id && data.id.nome){
+        const continuar = confirm('Encontramos um questionário salvo de ' + data.id.nome + '. Deseja continuar de onde parou?');
+        if(continuar){
+          Object.assign(id, data.id);
+          Object.assign(state, data.state);
+          document.getElementById('f-nome').value  = id.nome  || '';
+          document.getElementById('f-nasc').value  = id.nasc  || '';
+          document.getElementById('f-email').value = id.email || '';
+          document.getElementById('id-screen').style.display = 'none';
+          document.getElementById('quiz').style.display = 'block';
+          renderAll();
+          return;
+        } else { clearSave(); }
+      }
+    }
+  } catch(e){}
 }
 
 function showQuiz() {
@@ -284,8 +318,9 @@ function showQuiz() {
     alert('Por favor, preencha todos os campos antes de continuar.');
     return;
   }
-  id.nome = nome;
-  id.nasc = nasc;
+  id.nome  = nome;
+  id.nasc  = nasc;
+  id.email = document.getElementById('f-email').value.trim();
   document.getElementById('id-screen').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
   renderAll();
@@ -471,6 +506,7 @@ function setScale(key, i, v) {
   state[key][i] = v;
   renderScale(idMap[key], qMap[key], key, 5);
   updateProg();
+  autoSave();
 }
 
 function renderHis() {
@@ -500,6 +536,7 @@ function setHis(i, v) {
   state.his[i] = decodeURIComponent(v);
   renderHis();
   updateProg();
+  autoSave();
 }
 
 function renderOpen() {
@@ -567,6 +604,7 @@ async function submitQuiz() {
 
   const payload = {
     data: dataStr, nome: id.nome, nasc: id.nasc, idade, sexo: id.sexo, genero: id.genero, unidade: id.unidade,
+    email_paciente: id.email,
     // scores
     tdah_des: sc.tdah_des, maxDes: sc.maxDes,
     tdah_hip: sc.tdah_hip, maxHip: sc.maxHip,
@@ -591,7 +629,8 @@ async function submitQuiz() {
     });
   } catch(err) { console.error(err); }
 
-  // Personaliza tela de agradecimento com nome e gênero
+  clearSave();
+
   const primeiroNome = id.nome.split(' ')[0];
   const genero = id.genero || '';
   const isMasc = genero === 'Homem cisgênero' || genero === 'Homem transgênero';
