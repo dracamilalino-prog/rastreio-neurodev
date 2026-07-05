@@ -238,26 +238,35 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
     </div>
   </div>
 
-  <!-- 10 INFÂNCIA E DESENVOLVIMENTO -->
+  <!-- 10 IMPACTO FUNCIONAL E CRITÉRIOS DIAGNÓSTICOS -->
   <div class="block">
-    <div class="block-head"><span class="block-num">10</span><span class="block-title">Infância e desenvolvimento</span><span class="block-sub">9 perguntas</span></div>
+    <div class="block-head"><span class="block-num">10</span><span class="block-title">Impacto funcional e critérios diagnósticos</span><span class="block-sub">10 perguntas</span></div>
+    <div class="block-body">
+      <p style="font-size:12px;color:var(--mid);margin-bottom:14px;line-height:1.6;">Essas perguntas ajudam a diferenciar um traço de personalidade de um quadro que realmente precisa de diagnóstico e cuidado — pense com calma em cada uma.</p>
+      <div id="critq"></div>
+    </div>
+  </div>
+
+  <!-- 11 INFÂNCIA E DESENVOLVIMENTO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">11</span><span class="block-title">Infância e desenvolvimento</span><span class="block-sub">9 perguntas</span></div>
     <div class="block-body">
       <p style="font-size:12px;color:var(--mid);margin-bottom:14px;line-height:1.6;">Essas perguntas são sobre a sua infância. Se você não lembra bem dessa fase, vale a pena perguntar pra quem te acompanhou quando criança — pais, avós, tios. Se você foi adotado(a) e não tem essas informações, sem problema — marque isso na primeira pergunta e siga em frente.</p>
       <div id="infq"></div>
     </div>
   </div>
 
-  <!-- 11 HISTÓRICO E CONTEXTO -->
+  <!-- 12 HISTÓRICO E CONTEXTO -->
   <div class="block">
-    <div class="block-head"><span class="block-num">11</span><span class="block-title">Histórico e contexto</span><span class="block-sub">6 perguntas</span></div>
+    <div class="block-head"><span class="block-num">12</span><span class="block-title">Histórico e contexto</span><span class="block-sub">6 perguntas</span></div>
     <div class="block-body">
       <div id="hisq"></div>
     </div>
   </div>
 
-  <!-- 12 PERGUNTAS ABERTAS -->
+  <!-- 13 PERGUNTAS ABERTAS -->
   <div class="block">
-    <div class="block-head"><span class="block-num">12</span><span class="block-title">Com suas próprias palavras</span><span class="block-sub">4 perguntas</span></div>
+    <div class="block-head"><span class="block-num">13</span><span class="block-title">Com suas próprias palavras</span><span class="block-sub">4 perguntas</span></div>
     <div class="block-body"><div id="openq"></div></div>
   </div>
 
@@ -454,6 +463,19 @@ const burnQs = [
 ];
 
 // 10 HISTÓRICO (misto)
+const critQs = [
+  { q: "Suas dificuldades de atenção ou organização aparecem em pelo menos 2 áreas diferentes da sua vida ao mesmo tempo (ex: trabalho E vida pessoal, estudos E relacionamentos)?", type:'yn' },
+  { q: "Essas dificuldades de atenção/organização causam prejuízo significativo — não só um desconforto leve — no seu desempenho ou bem-estar?", type:'yn' },
+  { q: "Você já apresentava sinais parecidos de desatenção/agitação antes dos 12 anos de idade, mesmo que não diagnosticados na época?", type:'yn' },
+  { q: "Suas características sociais ou sensoriais (jeito de se comunicar, sensibilidades) aparecem em múltiplos contextos, não só em um lugar específico?", type:'yn' },
+  { q: "Essas características sociais/sensoriais causam prejuízo significativo no seu funcionamento social, profissional ou em outras áreas importantes da vida?", type:'yn' },
+  { q: "Esses padrões sociais/sensoriais estão presentes desde o início do seu desenvolvimento, mesmo que só reconhecidos ou nomeados mais tarde?", type:'yn' },
+  { q: "Sua capacidade de aprendizado ou raciocínio é consistentemente muito acima da média em múltiplos contextos — não só em uma matéria ou situação específica?", type:'yn' },
+  { q: "Suas dificuldades de leitura, escrita ou matemática são desproporcionais ao seu esforço e à sua inteligência geral, e persistem apesar de tentativas de melhorar?", type:'yn' },
+  { q: "Seu esgotamento atual representa uma mudança clara em relação ao seu funcionamento anterior — você funcionava visivelmente melhor antes?", type:'yn' },
+  { q: "No geral, você diria que essas dificuldades vêm causando sofrimento clinicamente significativo — e não apenas uma variação normal da sua personalidade?", type:'yn' },
+];
+
 const infQs = [
   { q: "Você foi adotado(a)?", type:'single', opts:["Não","Sim","Prefiro não informar"] },
   { q: "Quem te ajudou a responder essa seção sobre a infância?", type:'single', opts:["Respondi sozinho(a), pela minha lembrança","Meus pais me ajudaram a responder","Meus avós me ajudaram a responder","Não tenho essas informações disponíveis"] },
@@ -495,6 +517,7 @@ let state = {
   int:  Array(8).fill(null),
   lex:  Array(8).fill(null),
   burn: Array(8).fill(null),
+  crit: {},
   inf:  {},
   his:  {},
   open: Array(4).fill(""),
@@ -506,6 +529,7 @@ const qMap   = { at:atQs, org:orgQs, imp:impQs, soc:socQs, sen:senQs, cog:cogQs,
 // ── RENDER ────────────────────────────────────────────────────────────────
 function renderAll() {
   KEYS.forEach(k => renderScale(idMap[k], qMap[k], k, 5));
+  renderCrit();
   renderInf();
   renderHis();
   renderOpen();
@@ -529,6 +553,29 @@ function renderScale(containerId, qs, key, max) {
 function setScale(key, i, v) {
   state[key][i] = v;
   renderScale(idMap[key], qMap[key], key, 5);
+  updateProg();
+  autoSave();
+}
+
+function renderCrit() {
+  const c = document.getElementById('critq');
+  c.innerHTML = '';
+  critQs.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    let inner = `<div class="q-text">${i+1}. ${item.q}</div>`;
+    inner += `<div class="opts">` +
+      ['Sim','Não','Não sei'].map(v =>
+        `<button class="opt ${state.crit[i]===v?'sel':''}" onclick="setCrit(${i},'${v}')">${v}</button>`
+      ).join('') + `</div>`;
+    div.innerHTML = inner;
+    c.appendChild(div);
+  });
+}
+
+function setCrit(i, v) {
+  state.crit[i] = v;
+  renderCrit();
   updateProg();
   autoSave();
 }
@@ -607,9 +654,10 @@ function renderOpen() {
 }
 
 function updateProg() {
-  const total = 10+8+8+10+9+10+8+8+8+9+6+4;
+  const total = 10+8+8+10+9+10+8+8+8+10+9+6+4;
   let ans = 0;
   KEYS.forEach(k => { ans += state[k].filter(v=>v!==null).length; });
+  ans += Object.keys(state.crit).length;
   ans += Object.keys(state.inf).length;
   ans += Object.keys(state.his).length;
   document.getElementById('progBar').style.width = Math.min(100, Math.round(ans/total*100))+'%';
@@ -675,6 +723,7 @@ async function submitQuiz() {
     burn: state.burn,
     his: state.his, open: state.open,
     inf: state.inf,
+    crit: state.crit,
   };
 
   try {
