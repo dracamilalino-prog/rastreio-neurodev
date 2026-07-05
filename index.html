@@ -7,17 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#f7f4ef;--card:#fff;--ink:#1c1b1f;--mid:#5a5560;--light:#e8e4dd;--accent:#3d6b84;--accent2:#8b5e52;--border:#ddd8d0;--warm:#f2ede5;--danger:#c0392b;}
+:root{--bg:#f7f4ef;--card:#fff;--ink:#1c1b1f;--mid:#5a5560;--light:#e8e4dd;--accent:#6B3FA0;--accent2:#4A2272;--border:#ddd8d0;--warm:#f2ede5;--danger:#c0392b;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.7;}
 
 /* COVER */
 .cover{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1c1b1f;padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
-.cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(61,107,132,.25) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 80% 70%,rgba(139,94,82,.2) 0%,transparent 70%);}
+.cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(107,63,160,.28) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 80% 70%,rgba(74,34,114,.25) 0%,transparent 70%);}
 .cover-inner{position:relative;z-index:2;max-width:560px;}
 .cover-tag{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:2rem;}
 .cover h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:400;color:#fff;line-height:1.2;margin-bottom:1rem;}
-.cover h1 em{font-style:italic;color:#a8c4d4;}
+.cover h1 em{font-style:italic;color:#c9aee0;}
 .cover p{color:rgba(255,255,255,.5);font-size:14px;line-height:1.9;margin-bottom:2rem;max-width:440px;margin-left:auto;margin-right:auto;}
 .cover-note{margin-top:1.5rem;font-size:11px;color:rgba(255,255,255,.25);max-width:380px;margin-left:auto;margin-right:auto;}
 
@@ -31,7 +31,7 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
 .field input{width:100%;border:1.5px solid var(--border);border-radius:4px;padding:10px 14px;font-family:'Lato',sans-serif;font-size:14px;color:var(--ink);background:#fff;transition:border .15s;}
 .field input:focus{outline:none;border-color:var(--accent);}
 .radio-row{display:flex;gap:10px;flex-wrap:wrap;}
-.radio-btn{border:1.5px solid var(--border);background:#fff;padding:9px 20px;border-radius:20px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;color:var(--ink);}
+.radio-btn{border:1.5px solid var(--border);background:#fff;padding:12px 20px;min-height:44px;border-radius:20px;font-family:'Lato',sans-serif;font-size:14px;cursor:pointer;transition:all .15s;color:var(--ink);}
 .radio-btn:hover{border-color:var(--accent);}
 .radio-btn.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
 .btn-next{background:var(--ink);color:#fff;border:none;padding:14px 44px;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:background .2s;margin-top:8px;}
@@ -58,12 +58,12 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
 .q-text{font-size:14px;color:#2a2630;margin-bottom:10px;}
 .q-hint{font-size:12px;color:#999;margin-bottom:10px;font-style:italic;}
 .opts{display:flex;gap:7px;flex-wrap:wrap;}
-.opt{border:1.5px solid var(--border);background:#fff;padding:7px 16px;border-radius:20px;font-family:'Lato',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;color:var(--ink);}
-.opt:hover{border-color:var(--accent);background:#eef4f8;}
+.opt{border:1.5px solid var(--border);background:#fff;padding:12px 18px;min-height:44px;border-radius:20px;font-family:'Lato',sans-serif;font-size:14px;cursor:pointer;transition:all .15s;color:var(--ink);}
+.opt:hover{border-color:var(--accent);background:#f0e8ff;}
 .opt.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
 .num-opts{display:flex;gap:8px;flex-wrap:wrap;}
 .num-opt{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--ink);display:flex;align-items:center;justify-content:center;}
-.num-opt:hover{border-color:var(--accent);background:#eef4f8;}
+.num-opt:hover{border-color:var(--accent);background:#f0e8ff;}
 .num-opt.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
 .textarea-q{width:100%;border:1.5px solid var(--border);border-radius:4px;padding:10px 14px;font-family:'Lato',sans-serif;font-size:14px;resize:vertical;min-height:80px;color:var(--ink);background:#fff;transition:border .15s;}
 .textarea-q:focus{outline:none;border-color:var(--accent);}
@@ -119,6 +119,7 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
       </div>
       <div class="field">
         <label>Identidade de gênero</label>
+        <p style="font-size:12px;color:var(--mid);margin-bottom:10px;line-height:1.6;">Cis = você se identifica com o gênero que te disseram ao nascer. Trans = você não se identifica. Se nenhum termo fizer sentido pra você, escolha "Outro" ou "Prefiro não informar".</p>
         <div class="radio-row" id="f-genero">
           <button class="radio-btn" onclick="setSingle('genero','Mulher cisgênero',this)">Mulher cis</button>
           <button class="radio-btn" onclick="setSingle('genero','Homem cisgênero',this)">Homem cis</button>
@@ -237,17 +238,26 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--ink);font-si
     </div>
   </div>
 
-  <!-- 10 HISTÓRICO E CONTEXTO -->
+  <!-- 10 INFÂNCIA E DESENVOLVIMENTO -->
   <div class="block">
-    <div class="block-head"><span class="block-num">10</span><span class="block-title">Histórico e contexto</span><span class="block-sub">6 perguntas</span></div>
+    <div class="block-head"><span class="block-num">10</span><span class="block-title">Infância e desenvolvimento</span><span class="block-sub">9 perguntas</span></div>
+    <div class="block-body">
+      <p style="font-size:12px;color:var(--mid);margin-bottom:14px;line-height:1.6;">Essas perguntas são sobre a sua infância. Se você não lembra bem dessa fase, vale a pena perguntar pra quem te acompanhou quando criança — pais, avós, tios. Se você foi adotado(a) e não tem essas informações, sem problema — marque isso na primeira pergunta e siga em frente.</p>
+      <div id="infq"></div>
+    </div>
+  </div>
+
+  <!-- 11 HISTÓRICO E CONTEXTO -->
+  <div class="block">
+    <div class="block-head"><span class="block-num">11</span><span class="block-title">Histórico e contexto</span><span class="block-sub">6 perguntas</span></div>
     <div class="block-body">
       <div id="hisq"></div>
     </div>
   </div>
 
-  <!-- 11 PERGUNTAS ABERTAS -->
+  <!-- 12 PERGUNTAS ABERTAS -->
   <div class="block">
-    <div class="block-head"><span class="block-num">11</span><span class="block-title">Com suas próprias palavras</span><span class="block-sub">4 perguntas</span></div>
+    <div class="block-head"><span class="block-num">12</span><span class="block-title">Com suas próprias palavras</span><span class="block-sub">4 perguntas</span></div>
     <div class="block-body"><div id="openq"></div></div>
   </div>
 
@@ -444,6 +454,18 @@ const burnQs = [
 ];
 
 // 10 HISTÓRICO (misto)
+const infQs = [
+  { q: "Você foi adotado(a)?", type:'single', opts:["Não","Sim","Prefiro não informar"] },
+  { q: "Quem te ajudou a responder essa seção sobre a infância?", type:'single', opts:["Respondi sozinho(a), pela minha lembrança","Meus pais me ajudaram a responder","Meus avós me ajudaram a responder","Não tenho essas informações disponíveis"] },
+  { q: "Você teve atraso pra começar a falar ou andar, comparado a outras crianças da idade?", type:'yn' },
+  { q: "Na infância, você tinha dificuldade em fazer ou manter amizades?", type:'yn' },
+  { q: "Na infância, você era descrito(a) como uma criança muito inquieta, agitada ou impulsiva?", type:'yn' },
+  { q: "Na infância, você tinha interesses muito intensos e específicos (decorava fatos, falava sem parar sobre um assunto)?", type:'yn' },
+  { q: "Na infância, você tinha sensibilidade incomum a sons, texturas, cheiros ou luzes?", type:'yn' },
+  { q: "Você teve dificuldades de aprendizagem na escola primária (ler, escrever, matemática)?", type:'yn' },
+  { q: "Como você era descrito(a) na infância pela família ou pela escola?", type:'single', opts:["Criança tranquila e fácil","Criança desafiadora/agitada","Muito na dela / quietinha","Uma mistura, dependia do dia","Não sei / não tenho essa informação"] },
+];
+
 const hisQs = [
   { q: "Você já teve algum diagnóstico de saúde mental ou neurodesenvolvimento?", type:'yn' },
   { q: "Alguém na sua família tem diagnóstico de TDAH, TEA, dislexia ou altas habilidades?", type:'yn' },
@@ -473,6 +495,7 @@ let state = {
   int:  Array(8).fill(null),
   lex:  Array(8).fill(null),
   burn: Array(8).fill(null),
+  inf:  {},
   his:  {},
   open: Array(4).fill(""),
 };
@@ -483,6 +506,7 @@ const qMap   = { at:atQs, org:orgQs, imp:impQs, soc:socQs, sen:senQs, cog:cogQs,
 // ── RENDER ────────────────────────────────────────────────────────────────
 function renderAll() {
   KEYS.forEach(k => renderScale(idMap[k], qMap[k], k, 5));
+  renderInf();
   renderHis();
   renderOpen();
   updateProg();
@@ -505,6 +529,36 @@ function renderScale(containerId, qs, key, max) {
 function setScale(key, i, v) {
   state[key][i] = v;
   renderScale(idMap[key], qMap[key], key, 5);
+  updateProg();
+  autoSave();
+}
+
+function renderInf() {
+  const c = document.getElementById('infq');
+  c.innerHTML = '';
+  infQs.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    let inner = `<div class="q-text">${i+1}. ${item.q}</div>`;
+    if (item.type === 'yn') {
+      inner += `<div class="opts">` +
+        ['Sim','Não','Não sei'].map(v =>
+          `<button class="opt ${state.inf[i]===v?'sel':''}" onclick="setInf(${i},'${v}')">${v}</button>`
+        ).join('') + `</div>`;
+    } else {
+      inner += `<div class="opts">` +
+        item.opts.map(v =>
+          `<button class="opt ${state.inf[i]===v?'sel':''}" onclick="setInf(${i},'${encodeURIComponent(v)}')">${v}</button>`
+        ).join('') + `</div>`;
+    }
+    div.innerHTML = inner;
+    c.appendChild(div);
+  });
+}
+
+function setInf(i, v) {
+  state.inf[i] = decodeURIComponent(v);
+  renderInf();
   updateProg();
   autoSave();
 }
@@ -553,9 +607,10 @@ function renderOpen() {
 }
 
 function updateProg() {
-  const total = 10+8+8+10+9+10+8+8+8+4;
+  const total = 10+8+8+10+9+10+8+8+8+9+6+4;
   let ans = 0;
   KEYS.forEach(k => { ans += state[k].filter(v=>v!==null).length; });
+  ans += Object.keys(state.inf).length;
   ans += Object.keys(state.his).length;
   document.getElementById('progBar').style.width = Math.min(100, Math.round(ans/total*100))+'%';
 }
@@ -619,12 +674,13 @@ async function submitQuiz() {
     sen: state.sen, cog: state.cog, int: state.int, lex: state.lex,
     burn: state.burn,
     his: state.his, open: state.open,
+    inf: state.inf,
   };
 
   try {
     await fetch(APPS_SCRIPT_URL, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
       body: JSON.stringify(payload)
     });
   } catch(err) { console.error(err); }
